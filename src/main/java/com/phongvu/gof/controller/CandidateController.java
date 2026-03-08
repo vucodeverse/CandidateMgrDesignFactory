@@ -1,6 +1,7 @@
 package com.phongvu.gof.controller;
 
 import com.phongvu.gof.creator.CandidateCreator;
+import com.phongvu.gof.di.Inject;
 import com.phongvu.gof.dto.CandidateDTO;
 import com.phongvu.gof.factory.CandidateFactory;
 import com.phongvu.gof.model.Candidate;
@@ -13,8 +14,12 @@ import java.util.List;
 public class CandidateController {
     private CandidateDTO dto = new CandidateDTO();
     private List<Candidate> list = new ArrayList<>();
-    private CandidateView view = new CandidateView();
-    private final CandidateFactory factory;
+
+    @Inject
+    private CandidateView view;
+
+    @Inject
+    private CandidateFactory factory;
 
     public CandidateController(CandidateFactory factory) {
         this.factory = factory;
@@ -26,28 +31,24 @@ public class CandidateController {
     }
 
     //Khởi tạo factory
-    public Candidate create(CandidateDTO dto) {
-
+    public Candidate create(CandidateDTO dto) throws AppException {
         try {
-            CandidateCreator creator
-                    = factory.getCreator(dto.getTypeCandidate());
-            return creator.createCandidate(dto);
+            return factory.getCreator(dto.getTypeCandidate()).createCandidate(dto);
         } catch (AppException e) {
-            System.out.println(e.getMessage());
-            return null;
+            throw new AppException(e.getMessage());
         }
     }
 
     //Thêm người mới
     public void addCandidate(Candidate candidate) {
-        list.add(candidate);
+        if (candidate != null) list.add(candidate);
     }
 
     //Hiển thị danh sách đối tượng
     public void printListNameCandidate() {
         StringBuilder str = new StringBuilder();
         for (Candidate candidate : list) {
-            str.append(candidate).append("\n");
+            str.append(candidate.toString()).append("\n");
         }
         view.setBody(str.toString());
         view.display();
