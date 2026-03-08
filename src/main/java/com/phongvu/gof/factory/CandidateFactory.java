@@ -52,4 +52,3 @@ public class CandidateFactory {
         return creatorMap.get(type);
     }
 }
-}
